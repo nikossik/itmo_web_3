@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="WebProgrammingLab" basedir=".">
+    <property file="build.properties"/>
+
+    <path id="test.classpath">
+        <pathelement path="${classes.dir}"/>
+        <pathelement path="${test.classes.dir}"/>
+        <fileset dir="${lib.dir}" includes="*"/>
+    </path>
+
+    <path id="src.classpath">
+        <fileset dir="${lib.dir}" includes="*"/>
+    </path>
+
+    <target name="init">
+        <mkdir dir="${build.dir}"/>
+        <mkdir dir="${classes.dir}"/>
+        <mkdir dir="${test.classes.dir}"/>
+        <mkdir dir="${war.dir}"/>
+    </target>
+
+    <target name="compile" depends="init" description="Compile the source code">
+        <javac srcdir="${src.dir}" destdir="${classes.dir}" source="17" target="17" encoding="UTF-8">
+            <classpath refid="src.classpath"/>
+        </javac>
+        <copy todir="${classes.dir}">
+            <fileset dir="src/main/resources">
+                <include name="**/*"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="compile-tests" description="Compile the test files">
+        <javac srcdir="${test.src.dir}" destdir="${test.classes.dir}" includeantruntime="true" source="17" target="17" encoding="UTF-8">
+            <classpath>
+                <pathelement path="${classes.dir}"/>
+                <fileset dir="${lib.dir}" includes="*"/>
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="build" depends="compile,compile-tests" description="Build and package into WAR">
+        <war destfile="${war.dir}/${name}.war" webxml="src/main/resources/WEB-INF/web.xml">
+            <fileset dir="src/main/resources">
+                <include name="**/*"/>
+            </fileset>
+            <lib dir="${lib.dir}" includes="*"/>
+            <classes dir="${classes.dir}"/>
+            <manifest>
+                <attribute name="Version" value="${project.version}"/>
+            </manifest>
+        </war>
+    </target>
+
+    <target name="clean" description="Clean compiled files">
+        <delete dir="${build.dir}"/>
+        <delete file="${war.dir}"/>
+    </target>
+
+    <target name="test" depends="build" description="Run JUnit 5 tests">
+        <path id="test.classpath">
+            <pathelement path="${classes.dir}"/>
+            <pathelement path="${test.classes.dir}"/>
+            <fileset dir="${lib.dir}" includes="*.jar"/>
+        </path>
+        <property name="test.classpath.string" refid="test.classpath"/>
+        <java jar="lib/junit-platform-console-standalone-1.8.2.jar" fork="true" failonerror="true">
+            <arg value="--class-path"/>
+            <arg value="${test.classpath.string}"/>
+            <arg value="--scan-class-path"/>
+            <arg value="${test.classes.dir}"/>
+        </java>
+    </target>
+
+    <target name="scp" depends="build" description="Deploy WAR file to remote server via SCP">
+        <scp file="${war.dir}/${war.name}.war"
+             todir="${scp.user}@${scp.server}:${scp.remote.dir}"
+             port="${scp.port}"
+             password="VWXb=8397"
+             trust="true">
+            <classpath>
+                <fileset dir="${lib.dir}" includes="jsch*.jar"/>
+            </classpath>
+        </scp>
+    </target>
+
+
+    <target name="team" description="Build and package the last 4 Git revisions into a ZIP archive">
+        <mkdir dir="${revisions.dir}"/>
+
+        <exec executable="git" outputproperty="current.branch" failonerror="true">
+            <arg value="rev-parse"/>
+            <arg value="--abbrev-ref"/>
+            <arg value="HEAD"/>
+        </exec>
+
+        <exec executable="git" outputproperty="commit.hashes" failonerror="true">
+            <arg value="log"/>
+            <arg value="--pretty=%H"/>
+            <arg value="-n"/>
+            <arg value="5"/>
+        </exec>
+
+        <script language="javascript">
+            <![CDATA[
+            var hashes = project.getProperty("commit.hashes").split("\n");
+            // Skip the first (current) commit, take the next 4
+            var previousCommits = hashes.slice(1, 5);
+            project.setProperty("previous.commits", previousCommits.join(","));
+            ]]>
+        </script>
+
+        <foreach list="${previous.commits}" target="build-revision" param="commit.hash">
+            <param name="revisions.dir" value="${revisions.dir}"/>
+        </foreach>
+
+        <zip destfile="${zip.file}">
+            <fileset dir="${revisions.dir}" includes="*.war"/>
+        </zip>
+
+        <exec executable="git" failonerror="true">
+            <arg value="checkout"/>
+            <arg value="${current.branch}"/>
+        </exec>
+
+        <delete dir="${revisions.dir}"/>
+    </target>
+
+    <target name="build-revision" description="Build a specific Git revision">
+        <exec executable="git" failonerror="true">
+            <arg value="checkout"/>
+            <arg value="${commit.hash}"/>
+        </exec>
+
+        <antcall target="clean"/>
+
+        <antcall target="build"/>
+
+        <copy file="${war.dir}/${war.name}.war" tofile="${revisions.dir}/${war.name}-${commit.hash}.war"/>
+    </target>
+</project>
