@@ -20,8 +20,10 @@
     </target>
 
     <target name="compile" depends="init" description="Compile the source code">
-        <javac srcdir="${src.dir}" destdir="${classes.dir}" source="17" target="17" encoding="UTF-8">
+        <javac srcdir="${src.dir}" destdir="${classes.dir}" source="17" target="17" encoding="UTF-8" fork="true">
             <classpath refid="src.classpath"/>
+            <compilerarg value="-processorpath"/>
+            <compilerarg value="lib/lombok.jar"/>
         </javac>
         <copy todir="${classes.dir}">
             <fileset dir="src/main/resources">
@@ -58,30 +60,25 @@
     </target>
 
     <target name="test" depends="build" description="Run JUnit 5 tests">
-        <path id="test.classpath">
-            <pathelement path="${classes.dir}"/>
-            <pathelement path="${test.classes.dir}"/>
-            <fileset dir="${lib.dir}" includes="*.jar"/>
-        </path>
-        <property name="test.classpath.string" refid="test.classpath"/>
-        <java jar="lib/junit-platform-console-standalone-1.8.2.jar" fork="true" failonerror="true">
-            <arg value="--class-path"/>
-            <arg value="${test.classpath.string}"/>
-            <arg value="--scan-class-path"/>
-            <arg value="${test.classes.dir}"/>
-        </java>
-    </target>
+    <property name="test.classpath.string" refid="test.classpath"/>
+    <java jar="lib/junit-platform-console-standalone-1.8.2.jar" fork="true" failonerror="true">
+        <arg value="--class-path"/>
+        <arg value="${test.classpath.string}"/>
+        <arg value="--scan-class-path"/>
+        <arg value="${test.classes.dir}"/>
+    </java>
+</target>
+
+
 
     <target name="scp" depends="build" description="Deploy WAR file to remote server via SCP">
-        <scp file="${war.dir}/${war.name}.war"
+        <scp file="${war.dir}/${name}.war"
              todir="${scp.user}@${scp.server}:${scp.remote.dir}"
              port="${scp.port}"
-             password="VWXb=8397"
-             trust="true">
-            <classpath>
-                <fileset dir="${lib.dir}" includes="jsch*.jar"/>
-            </classpath>
-        </scp>
+             keyfile="${scp.keyfile}"
+             trust="true"
+             verbose="true"
+             failonerror="true"/>
     </target>
 
 
@@ -136,6 +133,6 @@
 
         <antcall target="build"/>
 
-        <copy file="${war.dir}/${war.name}.war" tofile="${revisions.dir}/${war.name}-${commit.hash}.war"/>
+        <copy file="${war.dir}/${name}.war" tofile="${revisions.dir}/${name}-${commit.hash}.war"/>
     </target>
 </project>
