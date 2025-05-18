@@ -22,7 +22,7 @@
     </target>
 
     <target name="compile" depends="init" description="Compile the source code">
-        <javac srcdir="${src.dir}" destdir="${classes.dir}" source="17" target="17" encoding="UTF-8" fork="true">
+        <javac srcdir="${src.dir}" destdir="${classes.dir}" release="17" encoding="UTF-8" fork="true">
             <classpath refid="src.classpath"/>
             <compilerarg value="-processorpath"/>
             <compilerarg value="lib/lombok.jar"/>
@@ -35,7 +35,7 @@
     </target>
 
     <target name="compile-tests" description="Compile the test files">
-        <javac srcdir="${test.src.dir}" destdir="${test.classes.dir}" includeantruntime="true" source="17" target="17" encoding="UTF-8">
+        <javac srcdir="${test.src.dir}" destdir="${test.classes.dir}" includeantruntime="true" release="17" encoding="UTF-8">
             <classpath>
                 <pathelement path="${classes.dir}"/>
                 <fileset dir="${lib.dir}" includes="*"/>
