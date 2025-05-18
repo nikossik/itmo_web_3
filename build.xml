@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="WebProgrammingLab" basedir=".">
+    <property name="ant.build.javac.source" value="17"/>
+    <property name="ant.build.javac.target" value="17"/>
+    <property name="ant.build.javac.includeantruntime" value="false"/>
+    
     <taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
     <property file="build.properties"/>
     <property name="zip.file" value="${build.dir}/${name}-revisions.zip"/>
@@ -22,7 +26,12 @@
     </target>
 
     <target name="compile" depends="init" description="Compile the source code">
-        <javac srcdir="${src.dir}" destdir="${classes.dir}" release="17" encoding="UTF-8" fork="true" includeantruntime="false">
+        <javac srcdir="${src.dir}" 
+               destdir="${classes.dir}" 
+               release="17" 
+               encoding="UTF-8" 
+               fork="true" 
+               includeantruntime="${ant.build.javac.includeantruntime}">
             <classpath refid="src.classpath"/>
             <compilerarg value="-processorpath"/>
             <compilerarg value="lib/lombok.jar"/>
@@ -35,7 +44,11 @@
     </target>
 
     <target name="compile-tests" description="Compile the test files">
-        <javac srcdir="${test.src.dir}" destdir="${test.classes.dir}" includeantruntime="false" release="17" encoding="UTF-8">
+        <javac srcdir="${test.src.dir}" 
+               destdir="${test.classes.dir}" 
+               includeantruntime="${ant.build.javac.includeantruntime}" 
+               release="17" 
+               encoding="UTF-8">
             <classpath>
                 <pathelement path="${classes.dir}"/>
                 <fileset dir="${lib.dir}" includes="*"/>
