@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="WebProgrammingLab" basedir=".">
+    <taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
     <property file="build.properties"/>
 
     <path id="test.classpath">
@@ -93,21 +94,17 @@
 
         <exec executable="git" outputproperty="commit.hashes" failonerror="true">
             <arg value="log"/>
-            <arg value="--pretty=%H"/>
+            <arg value="--pretty=format:%H"/>
             <arg value="-n"/>
             <arg value="5"/>
         </exec>
 
-        <script language="javascript">
-            <![CDATA[
-            var hashes = project.getProperty("commit.hashes").split("\n");
-            // Skip the first (current) commit, take the next 4
-            var previousCommits = hashes.slice(1, 5);
-            project.setProperty("previous.commits", previousCommits.join(","));
-            ]]>
-        </script>
+        <propertyregex property="previous.commits"
+            input="${commit.hashes}"
+            regexp="([^\n]*)\n([^\n]*)\n([^\n]*)\n([^\n]*)\n([^\n]*)"
+            select="\2,\3,\4,\5"/>
 
-        <foreach list="${previous.commits}" target="build-revision" param="commit.hash">
+        <foreach list="${previous.commits}" param="commit.hash" target="build-revision">
             <param name="revisions.dir" value="${revisions.dir}"/>
         </foreach>
 
