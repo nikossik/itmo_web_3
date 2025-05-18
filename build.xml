@@ -2,6 +2,7 @@
 <project name="WebProgrammingLab" basedir=".">
     <taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
     <property file="build.properties"/>
+    <property name="zip.file" value="${build.dir}/${name}-revisions.zip"/>
 
     <path id="test.classpath">
         <pathelement path="${classes.dir}"/>
