@@ -77,10 +77,9 @@
         <scp file="${war.dir}/${name}.war"
              todir="${scp.user}@${scp.server}:${scp.remote.dir}"
              port="${scp.port}"
-             keyfile="${scp.keyfile}"
+             password="${scp.password}"
              trust="true"
-             verbose="true"
-             failonerror="true"/>
+             verbose="true"/>
     </target>
 
 
