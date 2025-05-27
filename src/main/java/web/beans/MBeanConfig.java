@@ -15,18 +15,18 @@ public class MBeanConfig {
     @Getter
     @Inject
     private HitPercentage hitPercentage;
-    private ObjectName pointsName;
-    private ObjectName clickName;
+    private ObjectName pointCounterName;
+    private ObjectName hitPercentageName;
 
     public void registerMBeans() {
         try {
             MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
 
-            pointsName = new ObjectName("web.beans:type=PointCounter");
-            clickName = new ObjectName("web.beans:type=HitPercentage");
+            pointCounterName = new ObjectName("web.beans:type=PointCounter");
+            hitPercentageName = new ObjectName("web.beans:type=HitPercentage");
 
-            mbs.registerMBean(pointCounter, pointsName);
-            mbs.registerMBean(hitPercentage, clickName);
+            mbs.registerMBean(pointCounter, pointCounterName);
+            mbs.registerMBean(hitPercentage, hitPercentageName);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -35,11 +35,11 @@ public class MBeanConfig {
     public void unregisterMBeans() {
         try {
             MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-            if (pointsName != null) {
-                mbs.unregisterMBean(pointsName);
+            if (pointCounterName != null) {
+                mbs.unregisterMBean(pointCounterName);
             }
-            if (clickName != null) {
-                mbs.unregisterMBean(clickName);
+            if (hitPercentageName != null) {
+                mbs.unregisterMBean(hitPercentageName);
             }
         } catch (Exception e) {
             e.printStackTrace();
