@@ -1,0 +1,16 @@
+networks:
+  shared_network:
+
+services:
+
+  database:
+    image: postgres:15
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: nikossik
+      POSTGRES_PASSWORD: nikossik
+      POSTGRES_DB: studs
+    networks:
+      - shared_network
