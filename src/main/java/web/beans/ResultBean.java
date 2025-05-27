@@ -4,6 +4,7 @@ import jakarta.enterprise.context.SessionScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import lombok.Getter;
+import lombok.Setter;
 import web.tables.Result;
 
 import java.io.Serializable;
@@ -12,6 +13,7 @@ import java.io.Serializable;
 @SessionScoped
 public class ResultBean implements Serializable {
 
+    @Setter
     @Getter
     private Result result = new Result();
 
@@ -23,10 +25,6 @@ public class ResultBean implements Serializable {
     
     @Inject
     private HitPercentage hitPercentage;
-
-    public void setResult(Result result) {
-        this.result = result;
-    }
 
     public void checkHit() {
         result.setHit(checkPoint());

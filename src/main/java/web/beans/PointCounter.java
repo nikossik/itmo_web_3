@@ -51,7 +51,7 @@ public class PointCounter implements PointCounterMBean {
             message = "Y coordinate (" + y + ") is greater than maximum boundary (" + maxY + ")";
         }
         
-        if (isOutsideBoundaries && message != null) {
+        if (isOutsideBoundaries) {
             boundaryViolations.add(message);
             notifyListeners(x, y, message);
         }

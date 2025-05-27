@@ -2,6 +2,7 @@ package web.beans;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import lombok.Getter;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
@@ -11,6 +12,7 @@ import java.lang.management.ManagementFactory;
 public class MBeanConfig {
     @Inject
     private PointCounter pointCounter;
+    @Getter
     @Inject
     private HitPercentage hitPercentage;
     private ObjectName pointsName;
@@ -44,11 +46,4 @@ public class MBeanConfig {
         }
     }
 
-    public PointCounter getPointCounter() {
-        return pointCounter;
-    }
-
-    public HitPercentage getHitPercentage() {
-        return hitPercentage;
-    }
 }
