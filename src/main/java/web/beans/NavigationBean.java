@@ -14,4 +14,8 @@ public class NavigationBean {
     public String toIndexPage() {
         return "index?faces-redirect=true";
     }
+    
+    public String toStatisticsPage() {
+        return "statistics?faces-redirect=true";
+    }
 }

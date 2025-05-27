@@ -19,10 +19,24 @@ public class ResultBean implements Serializable {
 
     @Inject
     private ResultListBean resultListBean;
+    
+    @Inject
+    private PointCounter pointCounter;
+    
+    @Inject
+    private HitPercentage hitPercentage;
+
+    public void setResult(Result result) {
+        this.result = result;
+    }
 
     public void checkHit() {
         result.setHit(checkPoint());
         saveResult();
+        
+        pointCounter.addPoint(result);
+        
+        hitPercentage.addPoint(result.isHit());
     }
 
     private void saveResult() {
@@ -41,6 +55,8 @@ public class ResultBean implements Serializable {
 
     public String clearResults() {
         resultListBean.clearResults();
+        pointCounter.resetCounters();
+        hitPercentage.reset();
         return "main?faces-redirect=true";
     }
 }

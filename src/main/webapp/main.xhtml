@@ -109,9 +109,12 @@
 
         <footer class="main-footer">
             <h:form>
-                <h:commandButton value="Вернутся на главную"
+                <h:commandButton value="Вернуться на главную"
                                  action="#{navigationBean.toIndexPage}"
                                  styleClass="back-button"/>
+                <h:commandButton value="Статистика точек"
+                                 action="#{navigationBean.toStatisticsPage}"
+                                 styleClass="button"/>
             </h:form>
         </footer>
     </div>
