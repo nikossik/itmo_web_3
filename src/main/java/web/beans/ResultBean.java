@@ -4,7 +4,6 @@ import jakarta.enterprise.context.SessionScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import lombok.Getter;
-import lombok.Setter;
 import web.tables.Result;
 
 import java.io.Serializable;
@@ -14,7 +13,6 @@ import java.io.Serializable;
 public class ResultBean implements Serializable {
 
     @Getter
-    @Setter
     private Result result = new Result();
 
     @Inject
