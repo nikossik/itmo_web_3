@@ -6,17 +6,18 @@ import jakarta.servlet.ServletContextListener;
 import jakarta.servlet.annotation.WebListener;
 
 @WebListener
-public class ApplicationStartupListener implements ServletContextListener {
+public class MBeanInitializer implements ServletContextListener {
+
     @Inject
-    private MBeanConfig mBeanConfig;
+    private MBeanRegistry mBeanRegistry;
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        mBeanConfig.registerMBeans();
+        mBeanRegistry.registerMBeans();
     }
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
-        mBeanConfig.unregisterMBeans();
+        mBeanRegistry.unregisterMBeans();
     }
 }

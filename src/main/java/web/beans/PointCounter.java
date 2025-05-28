@@ -4,91 +4,58 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;
 import web.tables.Result;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import javax.management.Notification;
+import javax.management.NotificationBroadcasterSupport;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Named("pointCounter")
 @ApplicationScoped
-public class PointCounter implements PointCounterMBean {
-    
-    private int totalPointCount = 0;
-    private int pointsInAreaCount = 0;
-    
-    private double minX = -3.0;
-    private double maxX = 3.0;
-    private double minY = -5.0;
-    private double maxY = 5.0;
-    
-    private final List<String> boundaryViolations = new ArrayList<>();
-    
-    private final List<BoundaryViolationListener> listeners = new CopyOnWriteArrayList<>();
-    
+public class PointCounter extends NotificationBroadcasterSupport implements PointCounterMBean {
+
+    private final AtomicInteger totalPointCount = new AtomicInteger();
+    private final AtomicInteger pointsInAreaCount = new AtomicInteger();
+    private long notificationSequence = 1;
+
+    // Границы области
+    private final double minX = -3.0, maxX = 3.0;
+    private final double minY = -5.0, maxY = 5.0;
+
     public void addPoint(Result result) {
-        totalPointCount++;
-        
+        totalPointCount.incrementAndGet();
+
+        if (result.isHit()) {
+            pointsInAreaCount.incrementAndGet();
+        }
+
         double x = result.getX();
         double y = result.getY();
-        
-        if (result.isHit()) {
-            pointsInAreaCount++;
-        }
-        
-        boolean isOutsideBoundaries = false;
-        String message = null;
-        
-        if (x < minX) {
-            isOutsideBoundaries = true;
-            message = "X coordinate (" + x + ") is less than minimum boundary (" + minX + ")";
-        } else if (x > maxX) {
-            isOutsideBoundaries = true;
-            message = "X coordinate (" + x + ") is greater than maximum boundary (" + maxX + ")";
-        } else if (y < minY) {
-            isOutsideBoundaries = true;
-            message = "Y coordinate (" + y + ") is less than minimum boundary (" + minY + ")";
-        } else if (y > maxY) {
-            isOutsideBoundaries = true;
-            message = "Y coordinate (" + y + ") is greater than maximum boundary (" + maxY + ")";
-        }
-        
-        if (isOutsideBoundaries) {
-            boundaryViolations.add(message);
-            notifyListeners(x, y, message);
+
+        if (x < minX || x > maxX || y < minY || y > maxY) {
+            String message = "Координата вне границ: (" + x + ", " + y + ")";
+            Notification notification = new Notification(
+                "BoundaryViolation",
+                this,
+                notificationSequence++,
+                System.currentTimeMillis(),
+                message
+            );
+            sendNotification(notification);
         }
     }
-    
-    private void notifyListeners(double x, double y, String message) {
-        for (BoundaryViolationListener listener : listeners) {
-            listener.onBoundaryViolation(x, y, message);
-        }
+
+    public void reset() {
+        totalPointCount.set(0);
+        pointsInAreaCount.set(0);
+        notificationSequence = 1;
     }
-    
+
     @Override
     public int getTotalPointCount() {
-        return totalPointCount;
+        return totalPointCount.get();
     }
-    
+
     @Override
     public int getPointsInAreaCount() {
-        return pointsInAreaCount;
+        return pointsInAreaCount.get();
     }
-    
-    @Override
-    public void setCoordinateBoundaries(double minX, double maxX, double minY, double maxY) {
-        this.minX = minX;
-        this.maxX = maxX;
-        this.minY = minY;
-        this.maxY = maxY;
-    }
-    
-    @Override
-    public List<String> getBoundaryViolations() {
-        return new ArrayList<>(boundaryViolations);
-    }
-    
-    public void resetCounters() {
-        totalPointCount = 0;
-        pointsInAreaCount = 0;
-        boundaryViolations.clear();
-    }
-} 
+}

@@ -19,39 +19,35 @@ public class ResultBean implements Serializable {
 
     @Inject
     private ResultListBean resultListBean;
-    
+
     @Inject
     private PointCounter pointCounter;
-    
+
     @Inject
     private HitPercentage hitPercentage;
 
     public void checkHit() {
-        result.setHit(checkPoint());
-        saveResult();
-        
+        result.setHit(isHit());
+        resultListBean.addResult(result);
+
+        // Обновление статистики
         pointCounter.addPoint(result);
-        
         hitPercentage.addPoint(result.isHit());
     }
 
-    private void saveResult() {
-        resultListBean.addResult(result);
-    }
-
-    private boolean checkPoint() {
+    private boolean isHit() {
         double x = result.getX();
         double y = result.getY();
         double r = result.getR();
 
-        return (x >= 0 && y >= 0 && x <= r && y <= r / 2) ||
-                (x <= 0 && y <= 0 && (x * x + y * y <= r * r)) ||
-                (x >= 0 && y <= 0 && y >= -r/2 + x/2);
+        return (x >= 0 && y >= 0 && x <= r && y <= r / 2) || // прямоугольник
+               (x <= 0 && y <= 0 && x * x + y * y <= r * r) || // круг
+               (x >= 0 && y <= 0 && y >= -r / 2 + x / 2);       // треугольник
     }
 
     public String clearResults() {
         resultListBean.clearResults();
-        pointCounter.resetCounters();
+        pointCounter.reset();
         hitPercentage.reset();
         return "main?faces-redirect=true";
     }
