@@ -71,25 +71,7 @@
                     </span>
                 </div>
             </div>
-            
-            <div class="stat-card">
-                <h2>Нарушения границ</h2>
-                <h:panelGroup rendered="#{empty pointCounter.boundaryViolations}">
-                    <p>Нет нарушений границ координатной плоскости.</p>
-                </h:panelGroup>
-                
-                <h:panelGroup rendered="#{not empty pointCounter.boundaryViolations}">
-                    <div class="violation-list">
-                        <ui:repeat value="#{pointCounter.boundaryViolations}" var="violation">
-                            <div class="violation-item">
-                                <h:outputText value="#{violation}" />
-                            </div>
-                        </ui:repeat>
-                    </div>
-                </h:panelGroup>
-            </div>
         </div>
-        
         <footer class="main-footer">
             <h:form>
                 <h:commandButton value="Вернуться на главную"
