@@ -6,11 +6,12 @@ import web.tables.Result;
 
 import javax.management.Notification;
 import javax.management.NotificationBroadcasterSupport;
+import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Named("pointCounter")
 @ApplicationScoped
-public class PointCounter extends NotificationBroadcasterSupport implements PointCounterMBean {
+public class PointCounter extends NotificationBroadcasterSupport implements PointCounterMBean, Serializable {
 
     private final AtomicInteger totalPointCount = new AtomicInteger();
     private final AtomicInteger pointsInAreaCount = new AtomicInteger();
@@ -34,7 +35,7 @@ public class PointCounter extends NotificationBroadcasterSupport implements Poin
             String message = "Координата вне границ: (" + x + ", " + y + ")";
             Notification notification = new Notification(
                 "BoundaryViolation",
-                this,
+                "PointCounter",
                 notificationSequence++,
                 System.currentTimeMillis(),
                 message
